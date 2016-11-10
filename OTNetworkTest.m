@@ -62,20 +62,20 @@ OTSubscriberKitNetworkStatsDelegate >
     audio_bw = 0;
     video_pl_ratio = -1;
     audio_pl_ratio = -1;
-    
-    if(!_myAudioDevice)
-    {
-        _myAudioDevice = [[OTDefaultAudioDevice alloc] init];
-    }
-    
-    [OTAudioDeviceManager setAudioDevice:_myAudioDevice];
-//    [_myAudioDevice setAudioPlayoutMute:YES];
-  
+
+    // if(!_myAudioDevice)
+    // {
+    //     _myAudioDevice = [[OTDefaultAudioDevice alloc] init];
+    // }
+
+    // [OTAudioDeviceManager setAudioDevice:_myAudioDevice];
+    // [_myAudioDevice setAudioPlayoutMute:YES];
+
     _token = [token copy];
     _runQualityStatsTest = needsQualityTest;
     _qualityTestDuration = qualityTestDuration;
     self.networkTestDelegate = delegate;
-    
+
     _session = [[OTSession alloc] initWithApiKey:apiKey
                                        sessionId:sesssionId
                                         delegate:self];
@@ -98,8 +98,8 @@ OTSubscriberKitNetworkStatsDelegate >
              respondsToSelector:@selector(networkTestDidCompleteWithResult:
                                           error:)])
         {
-//            [_myAudioDevice setAudioPlayoutMute:NO];
-            [OTAudioDeviceManager setAudioDevice:nil];
+            // [_myAudioDevice setAudioPlayoutMute:NO];
+            // [OTAudioDeviceManager setAudioDevice:nil];
             [self cleanupSession];
             [self.networkTestDelegate networkTestDidCompleteWithResult:result
                                                                  error:error];
@@ -116,7 +116,7 @@ OTSubscriberKitNetworkStatsDelegate >
 - (void)doConnect
 {
     OTError *error = nil;
-    
+
     [_session connectWithToken:_token error:&error];
     if (error)
     {
@@ -176,7 +176,7 @@ OTSubscriberKitNetworkStatsDelegate >
 {
     _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
     _subscriber.networkStatsDelegate = self;
-    
+
     OTError *error = nil;
     [_session subscribe:_subscriber error:&error];
     if (error)
@@ -205,11 +205,11 @@ videoNetworkStatsUpdated:(OTSubscriberKitVideoNetworkStats*)stats
         prevVideoTimestamp = stats.timestamp;
         prevVideoBytes = stats.videoBytesReceived;
     }
-    
+
     if (stats.timestamp - prevVideoTimestamp >= TIME_WINDOW)
     {
         video_bw = (8 * (stats.videoBytesReceived - prevVideoBytes)) / ((stats.timestamp - prevVideoTimestamp) / 1000ull);
-        
+
         [self processStats:stats];
         prevVideoTimestamp = stats.timestamp;
         prevVideoBytes = stats.videoBytesReceived;
@@ -225,11 +225,11 @@ audioNetworkStatsUpdated:(OTSubscriberKitAudioNetworkStats*)stats
         prevAudioTimestamp = stats.timestamp;
         prevAudioBytes = stats.audioBytesReceived;
     }
-    
+
     if (stats.timestamp - prevAudioTimestamp >= TIME_WINDOW)
     {
         audio_bw = (8 * (stats.audioBytesReceived - prevAudioBytes)) / ((stats.timestamp - prevAudioTimestamp) / 1000ull);
-        
+
         [self processStats:stats];
         prevAudioTimestamp = stats.timestamp;
         prevAudioBytes = stats.audioBytesReceived;
@@ -240,20 +240,20 @@ audioNetworkStatsUpdated:(OTSubscriberKitAudioNetworkStats*)stats
 {
     enum OTNetworkTestResult result = OTNetworkTestResultVideoAndVoice;
     NSDictionary* userInfo = nil;
-    
+
     BOOL canDoVideo = (video_bw >= 150000 && video_pl_ratio <= 0.03);
     BOOL canDoAudio = (audio_bw >= 25000 && audio_pl_ratio <= 0.05);
-    
+
     if (!canDoVideo && !canDoAudio)
     {
         NSLog(@"Starting Audio Only Test");
         // test for audio only stream
         _publisher.publishVideo = NO;
-        
+
         dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW,
                                               AUDIO_ONLY_TEST_DURATION * NSEC_PER_SEC);
         dispatch_after(delay,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0),^{
-            
+
             enum OTNetworkTestResult result = OTNetworkTestResultVideoAndVoice;
             NSDictionary* userInfo = nil;
             // you can tune audio bw threshold value based on your needs.
@@ -295,7 +295,7 @@ audioNetworkStatsUpdated:(OTSubscriberKitAudioNetworkStats*)stats
                                         userInfo:userInfo];
         _result = result;
         [_session disconnect:nil];
-        
+
     } else
     {
         NSLog(@"The quality of your network is good for video and audio call");
@@ -342,7 +342,7 @@ audioNetworkStatsUpdated:(OTSubscriberKitAudioNetworkStats*)stats
 - (void)sessionDidConnect:(OTSession*)session
 {
     NSLog(@"sessionDidConnect (%@)", session.sessionId);
-    
+
     // Step 2: We have successfully connected, now instantiate a publisher and
     // begin pushing A/V streams into OpenTok.
     [self doPublish];
@@ -354,12 +354,12 @@ audioNetworkStatsUpdated:(OTSubscriberKitAudioNetworkStats*)stats
     [NSString stringWithFormat:@"Session disconnected: (%@)",
      session.sessionId];
     NSLog(@"sessionDidDisconnect (%@)", alertMessage);
-    
+
     enum OTNetworkTestResult result = _result;
     OTError *error = [_error copy];
-    
+
     [self cleanupSession];
-    
+
     [self dispatchResultsToDelegateWithResult:result
                                         error:error];
 }
@@ -375,7 +375,7 @@ audioNetworkStatsUpdated:(OTSubscriberKitAudioNetworkStats*)stats
 streamDestroyed:(OTStream *)stream
 {
     NSLog(@"session streamDestroyed (%@)", stream.streamId);
-    
+
     if ([_subscriber.stream.streamId isEqualToString:stream.streamId])
     {
         [self cleanupSubscriber];
@@ -414,7 +414,7 @@ didFailWithError:(OTError*)error
     NSLog(@"subscriberDidConnectToStream (%@)",
           subscriber.stream.connection.connectionId);
     assert(_subscriber == subscriber);
-    
+
     if(!_runQualityStatsTest)
     {
         _result = OTNetworkTestResultVideoAndVoice;
@@ -424,7 +424,7 @@ didFailWithError:(OTError*)error
         dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW,
                                               _qualityTestDuration * NSEC_PER_SEC);
         dispatch_after(delay,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0),^{
-            
+
             [self checkQualityAndDisconnectSession];
         });
     }
@@ -438,7 +438,7 @@ didFailWithError:(OTError*)error
           error);
     [self dispatchResultsToDelegateWithResult:OTNetworkTestResultNotGood
                                         error:error];
-    
+
 }
 
 # pragma mark - OTPublisher delegate callbacks
@@ -456,7 +456,7 @@ didFailWithError:(OTError*)error
     {
         [self cleanupSubscriber];
     }
-    
+
     [self cleanupPublisher];
 }
 
