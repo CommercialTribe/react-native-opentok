@@ -6,9 +6,8 @@
 //  Copyright (c) 2015 TokBox, Inc. All rights reserved.
 //
 
-#import <RCTBridgeModule.h>
-@import Foundation;
-@import OpenTok;
+#import <Foundation/Foundation.h>
+#import <OpenTok/OpenTok.h>
 
 enum OTNetworkTestResult {
     OTNetworkTestResultVideoAndVoice,
@@ -20,14 +19,14 @@ enum OTNetworkTestResult {
 
 @interface OTNetworkTest : NSObject
 {
-    
+
 }
 - (void)runConnectivityTestWithApiKey:(NSString*)apiKey
-                            sessionId:(NSString*)sesssionId
-                                token:(NSString*)token
-                   executeQualityTest:(BOOL)needsQualityTest
-                  qualityTestDuration:(int)qualityTestDuration
-                             delegate:(id<OTNetworkTestDelegate>)delegate;
+                           sessionId:(NSString*)sesssionId
+                               token:(NSString*)token
+                  executeQualityTest:(BOOL)needsQualityTest
+                 qualityTestDuration:(int)qualityTestDuration
+                            delegate:(id<OTNetworkTestDelegate>)delegate;
 @end
 
 @protocol OTNetworkTestDelegate <NSObject>
