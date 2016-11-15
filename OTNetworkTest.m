@@ -44,11 +44,11 @@ OTSubscriberKitNetworkStatsDelegate >
 }
 
 - (void)runConnectivityTestWithApiKey:(NSString*)apiKey
-                            sessionId:(NSString*)sesssionId
-                                token:(NSString*)token
-                   executeQualityTest:(BOOL)needsQualityTest
-                  qualityTestDuration:(int)qualityTestDuration
-                             delegate:(id<OTNetworkTestDelegate>)delegate
+                           sessionId:(NSString*)sesssionId
+                               token:(NSString*)token
+                  executeQualityTest:(BOOL)needsQualityTest
+                 qualityTestDuration:(int)qualityTestDuration
+                            delegate:(id<OTNetworkTestDelegate>)delegate
 {
     prevVideoTimestamp = 0;
     prevVideoBytes = 0;
@@ -63,13 +63,14 @@ OTSubscriberKitNetworkStatsDelegate >
     video_pl_ratio = -1;
     audio_pl_ratio = -1;
 
-    // if(!_myAudioDevice)
-    // {
-    //     _myAudioDevice = [[OTDefaultAudioDevice alloc] init];
-    // }
+    if(!_myAudioDevice)
+    {
+        _myAudioDevice = [[OTDefaultAudioDevice alloc] init];
+        NSLog(@"Initializing OTDefaultAudioDevice %@", _myAudioDevice);
+    }
 
-    // [OTAudioDeviceManager setAudioDevice:_myAudioDevice];
-    // [_myAudioDevice setAudioPlayoutMute:YES];
+    [OTAudioDeviceManager setAudioDevice:_myAudioDevice];
+    [_myAudioDevice setAudioPlayoutMute:YES];
 
     _token = [token copy];
     _runQualityStatsTest = needsQualityTest;
@@ -83,7 +84,7 @@ OTSubscriberKitNetworkStatsDelegate >
 }
 
 -(void)dispatchResultsToDelegateWithResult:(enum OTNetworkTestResult)result
-                                     error:(OTError*)error
+                                            error:(OTError*)error
 {
     if(_session.sessionConnectionStatus == OTSessionConnectionStatusConnected)
     {
@@ -98,8 +99,11 @@ OTSubscriberKitNetworkStatsDelegate >
              respondsToSelector:@selector(networkTestDidCompleteWithResult:
                                           error:)])
         {
-            // [_myAudioDevice setAudioPlayoutMute:NO];
-            // [OTAudioDeviceManager setAudioDevice:nil];
+            [_myAudioDevice setAudioPlayoutMute:NO];
+
+            // Properly release the OTAudioDevice to be reset next time around
+            _myAudioDevice = nil;
+
             [self cleanupSession];
             [self.networkTestDelegate networkTestDidCompleteWithResult:result
                                                                  error:error];
