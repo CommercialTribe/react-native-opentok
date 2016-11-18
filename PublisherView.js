@@ -130,6 +130,11 @@ class PublisherView extends React.Component {
      * Enable video
      */
     videoEnabled: React.PropTypes.bool,
+	/**
+	 * This function is called when the pushisher is being resumed
+	 *
+	 */
+	onPublishResumed: React.PropTypes.func,
   };
 
 
@@ -144,13 +149,17 @@ class PublisherView extends React.Component {
     onArchiveStarted: noop,
     onArchiveStopped: noop,
 	onThumbnailReady: noop,
+	onPublishResumed: noop,
   };
 
   pausePublish() {
     OpenTokPublisherViewManager.pausePublish();
   }
   resumePublish() {
-    OpenTokPublisherViewManager.resumePublish();
+	  OpenTokPublisherViewManager.resumePublish()
+	  setTimeout(() => {
+			  if (this.props.onPublishResumed) this.props.onPublishResumed();
+		  }, 3000);
   }
   stopPublish() {
     OpenTokPublisherViewManager.stopPublish();

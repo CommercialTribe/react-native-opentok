@@ -23,6 +23,7 @@
     BOOL _isSessionCreated;
     BOOL _isPaused;
     BOOL _isPublished;
+    NSTimer *_recordTimer;
 }
 
 /**
@@ -55,6 +56,9 @@
     } else {
       _isSessionCreated = YES;
     }
+
+    [_recordTimer invalidate];
+    _recordTimer = nil;
 }
 
 /**
@@ -240,12 +244,21 @@
 
 #pragma mark - OTSession delegate - archive callbacks
 - (void)session:(OTSession *)session archiveStartedWithId:(NSString *)archiveId name:(NSString *)name {
-    [self saveThumbnail];
-    
+    if (_recordTimer == nil) {
+        NSMutableArray *params = [NSMutableArray array];
+        [params addObject:archiveId];
+        [params addObject:name];
+        _recordTimer = [NSTimer scheduledTimerWithTimeInterval:1.5 target:self selector:@selector(_progressRecordTimerFired:) userInfo:params repeats:NO];
+    }
+}
+
+- (void)_progressRecordTimerFired:(NSTimer *)progressTimer {
     _onArchiveStarted(@{
-        @"archiveId": archiveId,
-        @"name": name,
+        @"archiveId": progressTimer.userInfo[0],
+        @"name": progressTimer.userInfo[1],
    });
+    
+    [self saveThumbnail];
 }
 
 - (void)session:(OTSession *)session archiveStoppedWithId:(NSString *)archiveId {
