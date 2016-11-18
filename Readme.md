@@ -65,6 +65,7 @@ onSessionDidConnect | function
 onSessionDidDisconnect | function
 onArchiveStarted | function
 onArchiveStopped | function
+onPublishResumed | function
 ------------ | -------------
 onSubscribeStart | function
 onSubscribeError | function
