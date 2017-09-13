@@ -4,7 +4,7 @@
 //  Copyright (c) 2013 TokBox, Inc. All rights reserved.
 //
 #import "OTNetworkTest.h"
-#import "RCTBridgeModule.h"
+#import <React/RCTBridgeModule.h>
 
 @interface RCTOpenTokNetworkTest : NSObject <OTNetworkTestDelegate, RCTBridgeModule>
 

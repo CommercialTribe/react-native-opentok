@@ -8,8 +8,8 @@
 
 @import UIKit;
 #import "RCTOpenTokSubscriberView.h"
-#import "RCTEventDispatcher.h"
-#import "RCTUtils.h"
+#import <React/RCTEventDispatcher.h>
+#import <React/RCTUtils.h>
 #import <OpenTok/OpenTok.h>
 
 @interface RCTOpenTokSubscriberView () <OTSessionDelegate, OTSubscriberDelegate>
